@@ -10,6 +10,7 @@ use std::error::Error;
 use std::io;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use tracing::info;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -41,7 +42,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
         // Spawn our handler to be run asynchronously.
         tokio::spawn(async move {
-            tracing::debug!("accepted connection");
+            tracing::info!("accepted connection");
             if let Err(e) = process(state, stream, addr).await {
                 tracing::info!("an error occurred; error = {:?}", e);
             }
@@ -138,6 +139,7 @@ async fn process(
         tokio::select! {
             // A message was received from a peer. Send it to the current user.
             Some(msg) = peer.rx.recv() => {
+                info!(msg);
                 peer.lines.send(&msg).await?;
             }
             result = peer.lines.next() => match result {

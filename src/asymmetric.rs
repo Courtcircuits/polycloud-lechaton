@@ -16,9 +16,11 @@ fn main() {
     let pub_key = RsaPublicKey::from(&priv_key);
 
     // Encrypt
-    let data = b"hello world";
+    let data = b"Hello";
     let enc_data = pub_key
-        .encrypt(&mut rng, Pkcs1v15Encrypt, &data[..]) // Pkcs1 IS NOT CONSIDERED AS SECURE (because no auth mechanism) https://blog.cryptographyengineering.com/2012/12/28/the-anatomy-of-bad-idea/
+        .encrypt(&mut rng, Pkcs1v15Encrypt, &data[..]) // Some functions underlying this
+                                                       // implementation are note in constant
+                                                       // time https://people.redhat.com/~hkario/marvin/
         .expect("failed to encrypt");
     assert_ne!(&data[..], &enc_data[..]);
 
